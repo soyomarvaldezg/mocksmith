@@ -227,8 +227,9 @@ date=date                        →  "2004-06-03T01:38:55Z"
 **Data engineering pipelines**
 ```bash
 mocksmith template ecommerce -o ./input_data/
-docker-compose up  # Postgres + Spark + Airflow
-# Your pipeline reads ./input_data/ and runs ETL
+# For columnar/Parquet: convert CSV via DuckDB
+duckdb -c "COPY (SELECT * FROM read_csv_auto('input_data/orders_csv.csv')) TO 'input_data/orders.parquet'"
+# Your pipeline reads ./input_data/ and runs ETL (Spark, dbt, Airflow, etc.)
 ```
 
 **Database testing**
@@ -265,7 +266,60 @@ mocksmith sql users 1000 id=uuid name=firstname --null 0.3 --corrupt 0.1 --outli
 - **Foreign keys** — generate realistic multi-table datasets
 - **Nested JSON** — proper MongoDB-style documents
 - **Templates** — one command for entire datasets
-- **Single binary** — no Python environment, no Node modules, no Docker needed
+- **Single static binary** — ~9MB, no Python, no Node, no CGo, no Docker
+
+## Why Go?
+
+Most fake data generators are Python scripts or npm packages. Those work — but
+they come with baggage: virtual environments, `pip install`, `npm install`,
+startup time, and runtime dependencies.
+
+Mocksmith compiles to a single static binary. Download it. Run it. No
+interpreter, no package manager, no `requirements.txt`. It starts instantly
+because there's no interpreter warming up — the CPU executes the code directly.
+
+### Why is Mocksmith so fast?
+
+**Layman version:** Imagine writing a thousand letters by hand versus using a
+printing press. Python is the handwriting — each line runs through an
+interpreter that reads, translates, and then executes it. Mocksmith (Go) is the
+printing press — the whole thing was translated to machine code at compile time,
+so when you hit "run," the CPU just *goes*. No translation step, no pause, no
+warmup.
+
+**Technical version:** Mocksmith is a compiled Go binary. No virtual machine, no
+JIT compilation, no bytecode interpreter. The compiler emits native ARM64/x86
+instructions. At runtime, data generation streams through `io.Writer` — rows are
+built by gofakeit's template engine (minimal allocation, no reflection in the
+hot path), buffered through `bufio.Writer` to batch system calls, and flushed
+to disk or stdout. Memory usage stays constant regardless of row count since
+rows are never accumulated. The only thing that grows is the optional duplicate
+cache. A Python equivalent would pay interpreter overhead on every row, allocate
+Python objects for every value, and likely materialize the entire dataset in
+memory before writing.
+
+## Scope
+
+Mocksmith focuses on **row-based text formats** — SQL, CSV, and JSONL.
+These cover the vast majority of test data needs: database seeding, API payloads,
+ETL input, and MongoDB collections.
+
+### Parquet
+
+Parquet is the standard columnar format for analytics (Spark, DuckDB, Trino).
+Mocksmith keeps its scope intentionally narrow — a **single 9MB static binary**
+with no CGo, no platform-specific toolchains, no heavy dependencies. Adding
+native Parquet output would require Apache Arrow's C library, tripling build
+complexity and breaking cross-compilation.
+
+Instead, Mocksmith treats Parquet as a **downstream concern**. Generate the data
+in CSV, then convert with DuckDB in one command:
+
+```bash
+brew install duckdb
+mocksmith csv 1000000 id=uuid name=firstname -o data.csv
+duckdb -c "COPY (SELECT * FROM read_csv_auto('data.csv')) TO 'data.parquet'"
+```
 
 ## Inspired by
 
