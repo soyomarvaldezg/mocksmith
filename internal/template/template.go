@@ -84,6 +84,9 @@ func (tmpl *Template) Generate(opts GenerateOptions) error {
 		filename := table.Name + "." + ext
 		if opts.OutputDir != "" {
 			filename = filepath.Join(opts.OutputDir, filename)
+			if err := os.MkdirAll(opts.OutputDir, 0755); err != nil {
+				return fmt.Errorf("table %q: %w", table.Name, err)
+			}
 		}
 
 		w, closeW, err := openFile(filename)
