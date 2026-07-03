@@ -10,19 +10,10 @@
 
 ## Quick Start
 
-### Option 1: Install from source (recommended)
+### Option 1: Go install (one command)
 
 ```bash
-# Clone the repo
-git clone https://codeberg.org/soyomarvaldezg/mocksmith
-cd mocksmith
-
-# Install Task (build tool)
-brew install go-task          # macOS
-# or: go install github.com/go-task/task/v3/cmd/task@latest
-
-# Build and install to $GOPATH/bin
-task install                  # → ~/go/bin/mocksmith
+go install codeberg.org/soyomarvaldezg/mocksmith@latest
 ```
 
 Make sure `~/go/bin` is in your `$PATH`:
@@ -30,29 +21,32 @@ Make sure `~/go/bin` is in your `$PATH`:
 export PATH="$HOME/go/bin:$PATH"   # add to ~/.zshrc or ~/.bashrc
 ```
 
-### Option 2: Go install (no Task needed)
+### Option 2: Build from source
 
 ```bash
-go install codeberg.org/soyomarvaldezg/mocksmith@latest
+git clone https://codeberg.org/soyomarvaldezg/mocksmith
+cd mocksmith
+
+brew install go-task          # macOS, or: go install github.com/go-task/task/v3/cmd/task@latest
+task install                  # → ~/go/bin/mocksmith
 ```
 
-### Verify installation
+### Verify
 
 ```bash
 mocksmith --version
 ```
 
-### Generate your first dataset
+### First command
 
 ```bash
 mocksmith sql users 3 id=uuid name=firstname email=email
 ```
-
-# Output:
-# INSERT INTO users (id,name,email) VALUES
-# ('c2b4a6e4-adc2-499e-bf1f-9398305b4c60','Jonathon','gia_wilkinson@gibson.biz'),
-# ('70034b7b-a843-44e9-83c5-fc14bc817377','Clarissa','darianabaker@elliott.info'),
-# ('a3b4ba15-9e28-4afc-b5fb-1ca99602ac9b','Zoey','eadams@higgins.org');
+```
+INSERT INTO users (id,name,email) VALUES
+('c2b4a6e4...','Jonathon','gia_wilkinson@gibson.biz'),
+('70034b7b...','Clarissa','darianabaker@elliott.info'),
+('a3b4ba15...','Zoey','eadams@higgins.org');
 ```
 
 ## Features
