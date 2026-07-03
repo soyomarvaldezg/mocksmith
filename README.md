@@ -24,9 +24,9 @@ mocksmith sql users 3 id=uuid name=firstname email=email
 
 ### Three formats, one CLI
 ```bash
-mocksmith sql   users 100 id=uuid name=firstname email=email
-mocksmith csv         100 id=uuid name=firstname email=email
-mocksmith jsonl       100 id=uuid name=firstname email=email
+mocksmith sql   users 100 id=uuid name=firstname email=email  # needs table name
+mocksmith csv   100 id=uuid name=firstname email=email
+mocksmith jsonl 100 id=uuid name=firstname email=email
 ```
 
 ### 368 generators (gofakeit engine)
