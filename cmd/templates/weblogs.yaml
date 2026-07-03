@@ -1,0 +1,44 @@
+name: weblogs
+description: "Web server access logs with IPs, user agents, timestamps, status codes"
+seed: 42
+
+tables:
+  - name: access_logs
+    rows: 1000
+    format: csv
+    columns:
+      - name: ip_address
+        generator: ipv4address
+      - name: timestamp
+        generator: date
+      - name: method
+        generator: httpmethod
+      - name: path
+        generator: "regex:/api/v[1-2]/(users|products|orders|auth)/[a-z]{5,10}"
+      - name: status
+        generator: httpstatuscode
+      - name: bytes_sent
+        generator: "number:100,50000"
+      - name: user_agent
+        generator: useragent
+      - name: referer
+        generator: "randomstring:https://google.com,https://twitter.com,https://github.com,-"
+      - name: response_time_ms
+        generator: "number:5,2000"
+
+  - name: api_errors
+    rows: 50
+    format: jsonl
+    columns:
+      - name: error_id
+        generator: uuid
+      - name: timestamp
+        generator: date
+      - name: endpoint
+        generator: "regex:/api/v[1-2]/(users|products|orders|auth)/[a-z]{5,10}"
+      - name: status_code
+        generator: "randomstring:400,401,403,404,409,422,500"
+      - name: message
+        generator: sentence:8
+      - name: user_ip
+        generator: ipv4address

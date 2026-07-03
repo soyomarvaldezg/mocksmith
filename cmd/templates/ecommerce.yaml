@@ -1,0 +1,78 @@
+name: ecommerce
+description: "E-commerce dataset: customers, products, orders with foreign keys"
+seed: 42
+
+tables:
+  - name: customers
+    rows: 100
+    format: sql
+    columns:
+      - name: id
+        generator: uuid
+      - name: first_name
+        generator: firstname
+      - name: last_name
+        generator: lastname
+      - name: email
+        generator: email
+      - name: phone
+        generator: phone
+      - name: city
+        generator: city
+      - name: country
+        generator: country
+      - name: signup_date
+        generator: date
+
+  - name: products
+    rows: 50
+    format: sql
+    columns:
+      - name: id
+        generator: uuid
+      - name: sku
+        generator: "regex:[A-Z]{3}-[0-9]{4}"
+      - name: name
+        generator: productname
+      - name: category
+        generator: productcategory
+      - name: price
+        generator: price
+
+  - name: orders
+    rows: 500
+    format: sql
+    columns:
+      - name: id
+        generator: uuid
+      - name: customer_id
+        generator: "ref:customers.sql.id"
+      - name: product_id
+        generator: "ref:products.sql.id"
+      - name: quantity
+        generator: "number:1,10"
+      - name: total
+        generator: price
+      - name: status
+        generator: "randomstring:placed,shipped,delivered,cancelled,returned"
+      - name: created_at
+        generator: date
+
+  - name: orders_csv
+    rows: 500
+    format: csv
+    columns:
+      - name: id
+        generator: uuid
+      - name: customer_id
+        generator: "ref:customers.sql.id"
+      - name: product_id
+        generator: "ref:products.sql.id"
+      - name: quantity
+        generator: "number:1,10"
+      - name: total
+        generator: price
+      - name: status
+        generator: "randomstring:placed,shipped,delivered,cancelled,returned"
+      - name: created_at
+        generator: date

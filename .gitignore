@@ -1,0 +1,24 @@
+# Build output
+build/
+mocksmith
+mocksmith.exe
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# AI
+.crush/
+.graymatter/
+AGENTS.md
+excalidraw.log

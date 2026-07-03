@@ -1,0 +1,53 @@
+name: iot
+description: "IoT sensor data: devices, readings with timestamps"
+seed: 42
+
+tables:
+  - name: devices
+    rows: 20
+    format: sql
+    columns:
+      - name: id
+        generator: uuid
+      - name: device_name
+        generator: "regex:SENSOR-[A-Z]{2}-[0-9]{3}"
+      - name: device_type
+        generator: "randomstring:temperature,humidity,pressure,motion,light,gps,accelerometer"
+      - name: location
+        generator: city
+      - name: installed_at
+        generator: date
+
+  - name: sensor_readings
+    rows: 5000
+    format: csv
+    columns:
+      - name: reading_id
+        generator: uuid
+      - name: device_id
+        generator: "ref:devices.sql.id"
+      - name: timestamp
+        generator: date
+      - name: value
+        generator: "float64:-20,120"
+      - name: unit
+        generator: "randomstring:°C,%,hPa,m/s,lux,lat;lon,g"
+      - name: battery_level
+        generator: "number:0,100"
+      - name: signal_strength
+        generator: "number:-90,-20"
+
+  - name: alerts
+    rows: 30
+    format: jsonl
+    columns:
+      - name: alert_id
+        generator: uuid
+      - name: device_id
+        generator: "ref:devices.sql.id"
+      - name: severity
+        generator: "randomstring:critical,warning,info"
+      - name: message
+        generator: sentence:10
+      - name: triggered_at
+        generator: date
