@@ -133,3 +133,93 @@ func TestGenerateRowReproducible(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateWeighted(t *testing.T) {
+	faker := gofakeit.New(42)
+
+	val, err := Generate(faker, "weighted:A:100,B:0")
+	if err != nil {
+		t.Fatalf("weighted: %v", err)
+	}
+	if val != "A" {
+		t.Errorf("weighted with 100:0 should always pick A, got %q", val)
+	}
+}
+
+func TestGenerateWeightedDistribution(t *testing.T) {
+	faker := gofakeit.New(42)
+
+	counts := map[string]int{"A": 0, "B": 0, "C": 0}
+	for range 1000 {
+		val, err := Generate(faker, "weighted:A:50,B:30,C:20")
+		if err != nil {
+			t.Fatalf("weighted: %v", err)
+		}
+		counts[val]++
+	}
+
+	if counts["A"] == 0 || counts["B"] == 0 || counts["C"] == 0 {
+		t.Errorf("all values should appear with 1000 rolls, got %v", counts)
+	}
+
+	// A (50%) should appear more than C (20%)
+	if counts["A"] <= counts["C"] {
+		t.Errorf("A (50%%) should dominate C (20%%), got A=%d C=%d", counts["A"], counts["C"])
+	}
+}
+
+func TestGenerateWeightedReproducible(t *testing.T) {
+	f1 := gofakeit.New(42)
+	f2 := gofakeit.New(42)
+
+	v1, _ := Generate(f1, "weighted:X:7,Y:3")
+	v2, _ := Generate(f2, "weighted:X:7,Y:3")
+
+	if v1 != v2 {
+		t.Errorf("weighted not reproducible: %q vs %q", v1, v2)
+	}
+}
+
+func TestGenerateWeightedZeroTotal(t *testing.T) {
+	faker := gofakeit.New(42)
+
+	_, err := Generate(faker, "weighted:A:0,B:0")
+	if err == nil {
+		t.Error("expected error for zero total weight")
+	}
+}
+
+func TestGenerateWeightedBadFormat(t *testing.T) {
+	faker := gofakeit.New(42)
+
+	_, err := Generate(faker, "weighted:nocolon")
+	if err == nil {
+		t.Error("expected error for missing colon")
+	}
+
+	_, err = Generate(faker, "weighted:A:bad")
+	if err == nil {
+		t.Error("expected error for non-integer weight")
+	}
+}
+
+func TestGenerateWeightedWithRow(t *testing.T) {
+	faker := gofakeit.New(42)
+
+	columns := []schema.Column{
+		{Name: "id", Generator: "uuid"},
+		{Name: "status", Generator: "weighted:active:80,inactive:20"},
+	}
+
+	row, err := GenerateRow(faker, columns)
+	if err != nil {
+		t.Fatalf("GenerateRow with weighted: %v", err)
+	}
+
+	if row["id"] == "" {
+		t.Error("uuid column empty")
+	}
+	if row["status"] != "active" && row["status"] != "inactive" {
+		t.Errorf("unexpected weighted value: %q", row["status"])
+	}
+}

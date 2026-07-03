@@ -57,6 +57,22 @@ mocksmith sql users 1000 id=uuid name=firstname email=email \
 | `--duplicate-rate 0.2` | 20% of rows are copies of previous rows |
 | `--seed 42` | Reproducible output |
 
+### Weighted random values
+
+Real-world data follows distributions — most orders are "delivered," a few are
+"refunded." Use `weighted:` to control the ratio:
+
+```bash
+# 70% delivered, 20% pending, 10% refunded
+mocksmith sql orders 1000 status=weighted:delivered:70,pending:20,refunded:10
+
+# Error injection: 92% success, 5% 404s, 3% 500s
+mocksmith jsonl 10000 status=weighted:200:92,404:5,500:3
+```
+
+Weights are relative — `A:70,B:30` is the same distribution as `A:7,B:3`.
+Zero-weighted items are silently excluded.
+
 ### Foreign key references
 ```bash
 # Generate parent
