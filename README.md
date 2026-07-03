@@ -1,17 +1,52 @@
-# 🔨 Mocksmith
+<p align="center">
+  <img src="logo/mocksmith_logo.png" alt="Mocksmith Logo" width="600">
+</p>
 
-Generate realistic fake data for testing, demos, and data engineering pipelines.
+<h1 align="center">Mocksmith</h1>
 
-**SQL · CSV · JSON (Lines)** — streaming, reproducible, with configurable data quality degradation.
+<p align="center">Generate realistic fake data for testing, demos, and data engineering pipelines.</p>
+
+<p align="center"><strong>SQL · CSV · JSON (Lines)</strong> — streaming, reproducible, with configurable data quality degradation.</p>
 
 ## Quick Start
 
-```bash
-# Build and install
-task install              # → $GOPATH/bin/mocksmith (make sure ~/go/bin is in PATH)
+### Option 1: Install from source (recommended)
 
-# 3 rows of fake users
+```bash
+# Clone the repo
+git clone https://codeberg.org/soyomarvaldezg/mocksmith
+cd mocksmith
+
+# Install Task (build tool)
+brew install go-task          # macOS
+# or: go install github.com/go-task/task/v3/cmd/task@latest
+
+# Build and install to $GOPATH/bin
+task install                  # → ~/go/bin/mocksmith
+```
+
+Make sure `~/go/bin` is in your `$PATH`:
+```bash
+export PATH="$HOME/go/bin:$PATH"   # add to ~/.zshrc or ~/.bashrc
+```
+
+### Option 2: Go install (no Task needed)
+
+```bash
+go install codeberg.org/soyomarvaldezg/mocksmith@latest
+```
+
+### Verify installation
+
+```bash
+mocksmith --version
+```
+
+### Generate your first dataset
+
+```bash
 mocksmith sql users 3 id=uuid name=firstname email=email
+```
 
 # Output:
 # INSERT INTO users (id,name,email) VALUES
