@@ -28,6 +28,10 @@ func ParseColumns(args []string) ([]Column, error) {
 		name := parts[0]
 		gen := parts[1]
 
+		if name == "" {
+			return nil, fmt.Errorf("invalid column definition: %s (empty name)", arg)
+		}
+
 		col := Column{
 			Name:      name,
 			Generator: gen,
@@ -41,11 +45,21 @@ func ParseColumns(args []string) ([]Column, error) {
 
 		for _, seg := range segments {
 			if key, ok := strings.CutSuffix(seg, "[]"); ok {
+				if key == "" {
+					return nil, fmt.Errorf("invalid column definition: %s (empty array name)", arg)
+				}
 				col.ArrayKey = key
 				// don't add "[]" to path, just remember it's an array
 			} else {
+				if seg == "" {
+					return nil, fmt.Errorf("invalid column definition: %s (empty path segment)", arg)
+				}
 				path = append(path, seg)
 			}
+		}
+
+		if col.ArrayKey != "" && len(path) == 0 {
+			return nil, fmt.Errorf("invalid column definition: %s (array fields need a name, e.g. orders[].id)", arg)
 		}
 
 		col.Path = path

@@ -588,3 +588,59 @@ func TestRenderRowsRowCount(t *testing.T) {
 		t.Errorf("expected 7 rows, got %d", count)
 	}
 }
+
+func TestSQLQuoteDialects(t *testing.T) {
+	cases := []struct {
+		name    string
+		value   string
+		dialect SQLDialect
+		want    string
+	}{
+		{"standard quote", "O'Brien", SQLStandard, "'O''Brien'"},
+		{"standard backslash", `a\b`, SQLStandard, `'a\b'`},
+		{"mysql quote", "O'Brien", SQLMySQL, "'O''Brien'"},
+		{"mysql backslash", `a\b`, SQLMySQL, `'a\\b'`},
+		{"mysql trailing backslash", `abc\`, SQLMySQL, `'abc\\'`},
+	}
+
+	for _, tc := range cases {
+		if got := sqlQuote(tc.value, tc.dialect); got != tc.want {
+			t.Errorf("%s: sqlQuote(%q) = %q, want %q", tc.name, tc.value, got, tc.want)
+		}
+	}
+}
+
+func TestIsNumeric(t *testing.T) {
+	valid := []string{"0", "42", "-5", "3.14", "-0.5", "0.5", "100."}
+	for _, value := range valid {
+		if !isNumeric(value) {
+			t.Errorf("isNumeric(%q) = false, want true", value)
+		}
+	}
+
+	invalid := []string{"", "-", ".", "007", "0123", "00.5", "1.2.3", "1e3", "+1", "abc"}
+	for _, value := range invalid {
+		if isNumeric(value) {
+			t.Errorf("isNumeric(%q) = true, want false", value)
+		}
+	}
+}
+
+func TestParseSQLDialect(t *testing.T) {
+	for _, value := range []string{"", "standard", "mysql"} {
+		if _, err := ParseSQLDialect(value); err != nil {
+			t.Errorf("ParseSQLDialect(%q): %v", value, err)
+		}
+	}
+	if _, err := ParseSQLDialect("oracle"); err == nil {
+		t.Error("expected error for unsupported dialect")
+	}
+}
+
+func TestBuildNestedIgnoresEmptyPath(t *testing.T) {
+	columns := []schema.Column{{Name: "orders[]", Generator: "uuid", ArrayKey: "orders"}}
+	doc := buildNested(columns, []RowValue{{Value: "x"}}, gofakeit.New(1))
+	if len(doc) != 0 {
+		t.Errorf("expected empty document, got %v", doc)
+	}
+}

@@ -201,3 +201,21 @@ func TestGenerateRefMultipleTypes(t *testing.T) {
 		t.Errorf("bad JSONL ref: %q", v2)
 	}
 }
+
+func TestLoadRefRejectsOversizedFile(t *testing.T) {
+	f, err := os.CreateTemp("", "mocksmith_ref_large_*.csv")
+	if err != nil {
+		t.Fatalf("CreateTemp: %v", err)
+	}
+	defer os.Remove(f.Name())
+
+	if err := f.Truncate(maxRefFileSize + 1); err != nil {
+		t.Fatalf("Truncate: %v", err)
+	}
+	f.Close()
+
+	refCache = sync.Map{}
+	if _, err := loadRef(f.Name() + ".id"); err == nil {
+		t.Error("expected error for oversized ref file")
+	}
+}

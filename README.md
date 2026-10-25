@@ -178,6 +178,13 @@ INSERT INTO t (id,price,name) VALUES
 (42,99.99,'O''Brien');  -- numbers unquoted, quotes escaped as ''
 ```
 
+Use `--dialect mysql` when loading into MySQL, which also escapes
+backslashes so corrupt or outlier values cannot escape the string literal:
+
+```bash
+mocksmith sql t 10 x=randomstring:a\b --dialect mysql
+```
+
 ### Streaming by default
 Rows are written one at a time through `io.Writer`. No memory accumulation — handle millions of rows.
 
@@ -297,6 +304,7 @@ Flags:
   --null float             Fraction of values → NULL (0.0-1.0)
   --corrupt float          Fraction of non-null values to corrupt (0.0-1.0)
   --outlier float          Fraction of non-null values → edge cases (0.0-1.0)
+  --dialect string         SQL dialect for escaping: standard or mysql (default standard)
   -o, --output string      Write to file instead of stdout
 ```
 

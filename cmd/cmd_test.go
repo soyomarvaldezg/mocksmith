@@ -36,6 +36,7 @@ func resetFlags() {
 	sqlNullRate = 0
 	sqlCorruptRate = 0
 	sqlOutlierRate = 0
+	sqlDialect = "standard"
 	sqlOutput = ""
 
 	csvSeed = 0
@@ -143,6 +144,14 @@ func TestSQLBadColumn(t *testing.T) {
 	_, err := execute(t, "sql", "users", "1", "badcolumn")
 	if err == nil {
 		t.Error("expected error for missing = in column")
+	}
+}
+
+func TestSQLInvalidDialect(t *testing.T) {
+	resetFlags()
+	_, err := execute(t, "sql", "users", "1", "id=uuid", "--dialect", "oracle")
+	if err == nil {
+		t.Error("expected error for unsupported SQL dialect")
 	}
 }
 

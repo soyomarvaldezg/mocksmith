@@ -53,6 +53,10 @@ func buildNested(columns []schema.Column, values []RowValue, faker *gofakeit.Fak
 	for j, col := range columns {
 		rv := values[j]
 
+		if len(col.Path) == 0 {
+			continue
+		}
+
 		if col.ArrayKey != "" {
 			if arrays[col.ArrayKey] == nil {
 				arrays[col.ArrayKey] = make(map[string]string)
