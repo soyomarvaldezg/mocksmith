@@ -10,26 +10,34 @@
 
 ## Quick Start
 
-### Option 1: Go install (one command)
+### Install
+
+macOS:
+
+```bash
+brew install --cask soyomarvaldezg/tap/mocksmith
+```
+
+Windows (PowerShell):
+
+```powershell
+scoop bucket add soyomarvaldezg https://github.com/soyomarvaldezg/scoop-bucket
+scoop install soyomarvaldezg/mocksmith
+```
+
+Nix:
+
+```bash
+nix run github:soyomarvaldezg/mocksmith
+```
+
+Any platform with Go 1.26.4+:
 
 ```bash
 go install github.com/soyomarvaldezg/mocksmith@latest
 ```
 
-Make sure `~/go/bin` is in your `$PATH`:
-```bash
-export PATH="$HOME/go/bin:$PATH"   # add to ~/.zshrc or ~/.bashrc
-```
-
-### Option 2: Build from source
-
-```bash
-git clone https://github.com/soyomarvaldezg/mocksmith
-cd mocksmith
-
-brew install just             # macOS, or: go install github.com/casey/just@latest
-just install                  # → ~/go/bin/mocksmith
-```
+Prebuilt binaries and source builds are covered in [Installation](#installation).
 
 ### Verify
 
@@ -175,16 +183,92 @@ Rows are written one at a time through `io.Writer`. No memory accumulation — h
 
 ## Installation
 
-```bash
-# Go 1.26+
-go install github.com/soyomarvaldezg/mocksmith@latest
+### Homebrew (macOS)
 
-# Or build from source with just
+```bash
+brew install --cask soyomarvaldezg/tap/mocksmith
+```
+
+### Scoop (Windows)
+
+```powershell
+scoop bucket add soyomarvaldezg https://github.com/soyomarvaldezg/scoop-bucket
+scoop install soyomarvaldezg/mocksmith
+```
+
+### Nix
+
+Run without installing:
+
+```bash
+nix run github:soyomarvaldezg/mocksmith
+```
+
+Install into your profile:
+
+```bash
+nix profile install github:soyomarvaldezg/mocksmith
+```
+
+Or add it to a flake and use it directly:
+
+```nix
+inputs.mocksmithSrc.url = "github:soyomarvaldezg/mocksmith";
+
+# inputs.mocksmithSrc.packages.${pkgs.system}.default
+```
+
+To make `pkgs.mocksmith` available in `environment.systemPackages`, add
+an overlay in the same flake:
+
+```nix
+nixpkgs.overlays = [
+  (final: prev: {
+    mocksmith = mocksmithSrc.packages.${final.stdenv.hostPlatform.system}.default;
+  })
+];
+```
+
+### Prebuilt binaries
+
+Download the archive for your OS and architecture from the
+[latest release](https://github.com/soyomarvaldezg/mocksmith/releases/latest)
+and verify it against `checksums.txt`.
+
+macOS and Linux:
+
+```bash
+tar -xzf mocksmith_*_<os>_<arch>.tar.gz
+sudo mv mocksmith /usr/local/bin/
+```
+
+Windows: extract `mocksmith.exe` from the zip and add its directory to `PATH`.
+
+### Go install
+
+Requires Go 1.26.4 or newer.
+
+```bash
+go install github.com/soyomarvaldezg/mocksmith@latest
+```
+
+Make sure `$(go env GOPATH)/bin` is in your `PATH`.
+
+### Build from source
+
+```bash
 git clone https://github.com/soyomarvaldezg/mocksmith
 cd mocksmith
-brew install just         # macOS (or: go install github.com/casey/just@latest)
-just build                # → build/mocksmith
-just install              # → $GOPATH/bin/mocksmith
+
+just build     # → build/mocksmith
+just install   # → $(go env GOPATH)/bin/mocksmith
+```
+
+`just` is available via `brew install just` on macOS or
+`go install github.com/casey/just@latest`. Without `just`:
+
+```bash
+go build -o mocksmith .
 ```
 
 ## Usage
