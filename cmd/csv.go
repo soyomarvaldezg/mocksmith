@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/render"
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/render"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/spf13/cobra"
 )
 

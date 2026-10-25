@@ -8,17 +8,17 @@ import (
 	"strconv"
 	"strings"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/render"
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/render"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 	"gopkg.in/yaml.v3"
 )
 
 type Template struct {
-	Name        string      `yaml:"name"`
-	Description string      `yaml:"description"`
-	Seed        int64       `yaml:"seed"`
-	Tables      []TableDef  `yaml:"tables"`
+	Name        string     `yaml:"name"`
+	Description string     `yaml:"description"`
+	Seed        int64      `yaml:"seed"`
+	Tables      []TableDef `yaml:"tables"`
 }
 
 type TableDef struct {

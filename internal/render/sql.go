@@ -6,9 +6,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/generator"
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/generator"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 )
 
 type RowValue struct {

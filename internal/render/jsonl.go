@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"io"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/generator"
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/generator"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 )
 
 func JSONL(faker *gofakeit.Faker, w io.Writer, rows int, columns []schema.Column, duplicateRate float64, nullRate float64, corruptRate float64, outlierRate float64) error {

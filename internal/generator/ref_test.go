@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 )
 
 func TestGenerateRefInvalidFormat(t *testing.T) {

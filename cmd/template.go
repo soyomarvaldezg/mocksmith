@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/template"
+	"github.com/soyomarvaldezg/mocksmith/internal/template"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var weblogsTemplate []byte
 var iotTemplate []byte
 
 var (
-	tmplOutput  string
+	tmplOutput    string
 	tmplOverrides string
 )
 

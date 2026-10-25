@@ -1,6 +1,6 @@
 package main
 
-import "codeberg.org/soyomarvaldezg/mocksmith/cmd"
+import "github.com/soyomarvaldezg/mocksmith/cmd"
 
 func main() {
 	cmd.Execute()

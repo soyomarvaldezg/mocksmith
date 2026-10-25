@@ -3,8 +3,8 @@ package generator
 import (
 	"testing"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 )
 
 func TestGenerate(t *testing.T) {

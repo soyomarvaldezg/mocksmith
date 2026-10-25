@@ -13,7 +13,7 @@
 ### Option 1: Go install (one command)
 
 ```bash
-go install codeberg.org/soyomarvaldezg/mocksmith@latest
+go install github.com/soyomarvaldezg/mocksmith@latest
 ```
 
 Make sure `~/go/bin` is in your `$PATH`:
@@ -24,7 +24,7 @@ export PATH="$HOME/go/bin:$PATH"   # add to ~/.zshrc or ~/.bashrc
 ### Option 2: Build from source
 
 ```bash
-git clone https://codeberg.org/soyomarvaldezg/mocksmith
+git clone https://github.com/soyomarvaldezg/mocksmith
 cd mocksmith
 
 brew install just             # macOS, or: go install github.com/casey/just@latest
@@ -177,10 +177,10 @@ Rows are written one at a time through `io.Writer`. No memory accumulation — h
 
 ```bash
 # Go 1.26+
-go install codeberg.org/soyomarvaldezg/mocksmith@latest
+go install github.com/soyomarvaldezg/mocksmith@latest
 
 # Or build from source with just
-git clone https://codeberg.org/soyomarvaldezg/mocksmith
+git clone https://github.com/soyomarvaldezg/mocksmith
 cd mocksmith
 brew install just         # macOS (or: go install github.com/casey/just@latest)
 just build                # → build/mocksmith

@@ -1,4 +1,4 @@
-module codeberg.org/soyomarvaldezg/mocksmith
+module github.com/soyomarvaldezg/mocksmith
 
 go 1.26.4
 

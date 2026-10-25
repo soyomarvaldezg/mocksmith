@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 )
 
 func Generate(faker *gofakeit.Faker, kind string) (string, error) {

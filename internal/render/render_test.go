@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"codeberg.org/soyomarvaldezg/mocksmith/internal/schema"
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/soyomarvaldezg/mocksmith/internal/schema"
 )
 
 var testColumns = []schema.Column{
@@ -534,7 +534,6 @@ func TestJSONLNestedReproducible(t *testing.T) {
 		t.Errorf("nested JSONL not reproducible")
 	}
 }
-
 
 func TestRenderRowsZeroRows(t *testing.T) {
 	faker := gofakeit.New(42)
