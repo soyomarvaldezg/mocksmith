@@ -27,8 +27,8 @@ export PATH="$HOME/go/bin:$PATH"   # add to ~/.zshrc or ~/.bashrc
 git clone https://codeberg.org/soyomarvaldezg/mocksmith
 cd mocksmith
 
-brew install go-task          # macOS, or: go install github.com/go-task/task/v3/cmd/task@latest
-task install                  # → ~/go/bin/mocksmith
+brew install just             # macOS, or: go install github.com/casey/just@latest
+just install                  # → ~/go/bin/mocksmith
 ```
 
 ### Verify
@@ -179,12 +179,12 @@ Rows are written one at a time through `io.Writer`. No memory accumulation — h
 # Go 1.26+
 go install codeberg.org/soyomarvaldezg/mocksmith@latest
 
-# Or build from source with Task
+# Or build from source with just
 git clone https://codeberg.org/soyomarvaldezg/mocksmith
 cd mocksmith
-brew install go-task      # macOS (or: go install github.com/go-task/task/v3/cmd/task@latest)
-task build                # → build/mocksmith
-task install              # → $GOPATH/bin/mocksmith
+brew install just         # macOS (or: go install github.com/casey/just@latest)
+just build                # → build/mocksmith
+just install              # → $GOPATH/bin/mocksmith
 ```
 
 ## Usage
