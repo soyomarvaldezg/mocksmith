@@ -1,0 +1,35 @@
+name: Scoop Smoke Test
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scoop:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install Scoop
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+          irm get.scoop.sh | iex
+          "$env:USERPROFILE\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Install Mocksmith from the bucket
+        shell: pwsh
+        run: |
+          scoop bucket add soyomarvaldezg https://github.com/soyomarvaldezg/scoop-bucket
+          scoop install soyomarvaldezg/mocksmith
+
+      - name: Verify
+        shell: pwsh
+        run: |
+          mocksmith version
+          mocksmith sql users 1 id=uuid name=firstname
