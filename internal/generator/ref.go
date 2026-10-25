@@ -18,6 +18,8 @@ type refSource struct {
 
 var refCache sync.Map
 
+const maxRefFileSize = 256 << 20
+
 func loadRef(pathColumn string) (*refSource, error) {
 	if cached, ok := refCache.Load(pathColumn); ok {
 		return cached.(*refSource), nil
@@ -30,6 +32,14 @@ func loadRef(pathColumn string) (*refSource, error) {
 
 	file := pathColumn[:lastDot]
 	column := pathColumn[lastDot+1:]
+
+	info, statErr := os.Stat(file)
+	if statErr != nil {
+		return nil, statErr
+	}
+	if info.Size() > maxRefFileSize {
+		return nil, fmt.Errorf("ref %s: file too large (%d bytes, limit %d)", pathColumn, info.Size(), maxRefFileSize)
+	}
 
 	var values []string
 	var err error

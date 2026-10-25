@@ -23,8 +23,32 @@ type RowOptions struct {
 	OutlierRate   float64
 }
 
+const maxDuplicateCache = 100_000
+
+type SQLDialect string
+
+const (
+	SQLStandard SQLDialect = "standard"
+	SQLMySQL    SQLDialect = "mysql"
+)
+
+func ParseSQLDialect(value string) (SQLDialect, error) {
+	switch SQLDialect(value) {
+	case "", SQLStandard:
+		return SQLStandard, nil
+	case SQLMySQL:
+		return SQLMySQL, nil
+	default:
+		return "", fmt.Errorf("unsupported SQL dialect %q (use standard or mysql)", value)
+	}
+}
+
 func RenderRows(faker *gofakeit.Faker, w io.Writer, rows int, columns []schema.Column, opts RowOptions, rowFn func(w io.Writer, i int, values []RowValue) error) error {
-	rowCache := make([]map[string]string, 0, rows)
+	cacheCapacity := 0
+	if opts.DuplicateRate > 0 && rows > 0 {
+		cacheCapacity = min(rows, maxDuplicateCache)
+	}
+	rowCache := make([]map[string]string, 0, cacheCapacity)
 
 	for i := range rows {
 		var row map[string]string
@@ -37,7 +61,9 @@ func RenderRows(faker *gofakeit.Faker, w io.Writer, rows int, columns []schema.C
 			if err != nil {
 				return err
 			}
-			rowCache = append(rowCache, row)
+			if opts.DuplicateRate > 0 && len(rowCache) < maxDuplicateCache {
+				rowCache = append(rowCache, row)
+			}
 		}
 
 		values := make([]RowValue, 0, len(columns))
@@ -68,6 +94,10 @@ func RenderRows(faker *gofakeit.Faker, w io.Writer, rows int, columns []schema.C
 }
 
 func SQL(faker *gofakeit.Faker, w io.Writer, table string, rows int, columns []schema.Column, duplicateRate float64, nullRate float64, corruptRate float64, outlierRate float64) error {
+	return SQLWithDialect(faker, w, table, rows, columns, duplicateRate, nullRate, corruptRate, outlierRate, SQLStandard)
+}
+
+func SQLWithDialect(faker *gofakeit.Faker, w io.Writer, table string, rows int, columns []schema.Column, duplicateRate float64, nullRate float64, corruptRate float64, outlierRate float64, dialect SQLDialect) error {
 	names := make([]string, 0, len(columns))
 	for _, col := range columns {
 		names = append(names, col.Name)
@@ -86,7 +116,7 @@ func SQL(faker *gofakeit.Faker, w io.Writer, table string, rows int, columns []s
 			if rv.IsNull {
 				parts = append(parts, "NULL")
 			} else {
-				parts = append(parts, sqlQuote(rv.Value))
+				parts = append(parts, sqlQuote(rv.Value, dialect))
 			}
 		}
 
@@ -130,9 +160,13 @@ func generateOutlier(faker *gofakeit.Faker) string {
 	}
 }
 
-func sqlQuote(val string) string {
+func sqlQuote(val string, dialect SQLDialect) string {
 	if isNumeric(val) {
 		return val
+	}
+	if dialect == SQLMySQL {
+		val = strings.ReplaceAll(val, `\`, `\\`)
+		val = strings.ReplaceAll(val, "\x00", `\0`)
 	}
 	escaped := strings.ReplaceAll(val, "'", "''")
 	return "'" + escaped + "'"
@@ -142,21 +176,41 @@ func isNumeric(s string) bool {
 	if s == "" {
 		return false
 	}
-	dots := 0
-	for i, c := range s {
-		if c == '-' && i == 0 {
-			continue
+
+	start := 0
+	if s[0] == '-' {
+		start = 1
+		if len(s) == 1 {
+			return false
 		}
-		if c == '.' {
+	}
+
+	dots := 0
+	digits := 0
+	for i := start; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c >= '0' && c <= '9':
+			digits++
+		case c == '.':
 			dots++
 			if dots > 1 {
 				return false
 			}
-			continue
-		}
-		if c < '0' || c > '9' {
+		default:
 			return false
 		}
 	}
+
+	if digits == 0 {
+		return false
+	}
+
+	// Reject leading-zero integers such as "007"; keep "0" and "0.5".
+	unsigned := s[start:]
+	if len(unsigned) > 1 && unsigned[0] == '0' && unsigned[1] != '.' {
+		return false
+	}
+
 	return true
 }

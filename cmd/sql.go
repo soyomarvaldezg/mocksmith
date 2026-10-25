@@ -16,6 +16,7 @@ var (
 	sqlNullRate      float64
 	sqlCorruptRate   float64
 	sqlOutlierRate   float64
+	sqlDialect       string
 	sqlOutput        string
 )
 
@@ -36,6 +37,11 @@ var sqlCmd = &cobra.Command{
 			return err
 		}
 
+		dialect, err := render.ParseSQLDialect(sqlDialect)
+		if err != nil {
+			return err
+		}
+
 		faker := gofakeit.New(uint64(sqlSeed))
 
 		w, closeW, err := openOutput(sqlOutput)
@@ -44,7 +50,7 @@ var sqlCmd = &cobra.Command{
 		}
 		defer closeW()
 
-		return render.SQL(
+		return render.SQLWithDialect(
 			faker,
 			w,
 			table,
@@ -54,6 +60,7 @@ var sqlCmd = &cobra.Command{
 			sqlNullRate,
 			sqlCorruptRate,
 			sqlOutlierRate,
+			dialect,
 		)
 	},
 }
@@ -65,5 +72,6 @@ func init() {
 	sqlCmd.Flags().Float64Var(&sqlNullRate, "null", 0, "fraction of values to set to NULL (0.0-1.0)")
 	sqlCmd.Flags().Float64Var(&sqlCorruptRate, "corrupt", 0, "fraction of non-null values to corrupt (0.0-1.0)")
 	sqlCmd.Flags().Float64Var(&sqlOutlierRate, "outlier", 0, "fraction of non-null values to replace with outliers (0.0-1.0)")
+	sqlCmd.Flags().StringVar(&sqlDialect, "dialect", "standard", "SQL dialect for string escaping (standard or mysql)")
 	sqlCmd.Flags().StringVarP(&sqlOutput, "output", "o", "", "write output to file instead of stdout")
 }

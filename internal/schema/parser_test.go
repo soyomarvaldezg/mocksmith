@@ -53,3 +53,17 @@ func TestParseColumnsValueWithEquals(t *testing.T) {
 		t.Errorf("expected generator 'key=value', got %q", columns[1].Generator)
 	}
 }
+
+func TestParseColumnsRejectsMalformedPaths(t *testing.T) {
+	for _, def := range []string{
+		"orders[]=uuid",
+		"[]=uuid",
+		"orders[].=uuid",
+		"address..city=city",
+		"=uuid",
+	} {
+		if _, err := ParseColumns([]string{def}); err == nil {
+			t.Errorf("ParseColumns(%q) expected an error", def)
+		}
+	}
+}
