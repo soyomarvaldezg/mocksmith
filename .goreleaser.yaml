@@ -51,5 +51,34 @@ changelog:
       - "^build"
       - "^test"
 
+homebrew_casks:
+  - name: mocksmith
+    repository:
+      owner: soyomarvaldezg
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Casks
+    homepage: https://github.com/soyomarvaldezg/mocksmith
+    description: Generate realistic fake data for testing, demos, and data engineering pipelines.
+    license: MIT
+    binaries:
+      - mocksmith
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mocksmith"]
+          end
+
+scoops:
+  - name: mocksmith
+    repository:
+      owner: soyomarvaldezg
+      name: scoop-bucket
+      token: "{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}"
+    homepage: https://github.com/soyomarvaldezg/mocksmith
+    description: Generate realistic fake data for testing, demos, and data engineering pipelines.
+    license: MIT
+
 release:
   prerelease: auto
