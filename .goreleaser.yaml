@@ -40,5 +40,15 @@ archives:
 checksum:
   name_template: checksums.txt
 
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^chore"
+      - "^ci"
+      - "^docs"
+      - "^build"
+      - "^test"
+
 release:
   prerelease: auto
