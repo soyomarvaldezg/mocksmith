@@ -1,0 +1,27 @@
+name: Homebrew Smoke Test
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  brew:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: macos-latest
+    timeout-minutes: 15
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - name: Install Mocksmith from the tap
+        run: brew install --cask soyomarvaldezg/tap/mocksmith
+
+      - name: Verify
+        run: |
+          "$(brew --prefix)/bin/mocksmith" version
+          "$(brew --prefix)/bin/mocksmith" sql users 1 id=uuid name=firstname
