@@ -27,3 +27,14 @@ jobs:
         with:
           command: check
           args: --from-latest-tag
+
+  nix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: cachix/install-nix-action@d9186cbdca7adedf113a159fa91f725a27866771 # v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - run: nix build .#default --no-link
