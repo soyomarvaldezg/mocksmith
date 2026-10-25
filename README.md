@@ -34,7 +34,7 @@ just install                  # → ~/go/bin/mocksmith
 ### Verify
 
 ```bash
-mocksmith --version
+mocksmith version
 ```
 
 ### First command
@@ -58,7 +58,7 @@ mocksmith csv   100 id=uuid name=firstname email=email
 mocksmith jsonl 100 id=uuid name=firstname email=email
 ```
 
-### 368 generators (gofakeit engine)
+### 363 generators (gofakeit engine)
 ```bash
 mocksmith sql customers 5 id=uuid name=firstname phone=phone city=city country=country
 mocksmith sql products  5 sku=regex:[A-Z]{3}-[0-9]{4} name=productname price=price
@@ -265,7 +265,7 @@ street=street                    →  "36913 Prairieside"
 date=date                        →  "2004-06-03T01:38:55Z"
 ```
 
-368 generators total. Any gofakeit function works — see [gofakeit docs](https://github.com/brianvoe/gofakeit).
+363 generators total. Any gofakeit function works — see [gofakeit docs](https://github.com/brianvoe/gofakeit).
 
 ## Real-World Use Cases
 
