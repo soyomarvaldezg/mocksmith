@@ -4,6 +4,10 @@ dist/
 mocksmith
 mocksmith.exe
 
+# Nix
+result
+result-*
+
 # IDE
 .idea/
 .vscode/
