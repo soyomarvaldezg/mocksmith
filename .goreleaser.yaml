@@ -63,12 +63,6 @@ homebrew_casks:
     license: MIT
     binaries:
       - mocksmith
-    hooks:
-      post:
-        install: |
-          if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/mocksmith"]
-          end
 
 scoops:
   - name: mocksmith
