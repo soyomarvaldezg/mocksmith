@@ -25,7 +25,7 @@
             pname = "mocksmith";
             inherit version;
             src = self;
-            vendorHash = "sha256-avzxiRO+ZLGCaKAS34FkueepUpSvy5hBONLe2vhpf3Y=";
+            vendorHash = "sha256-1GsjHE2bLarHOEg/W1aAHcVfPDHfMYoPiDfBBwZairo=";
             subPackages = [ "." ];
             ldflags = [
               "-s"
