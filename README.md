@@ -12,32 +12,8 @@
 
 ### Install
 
-macOS:
-
-```bash
-brew install --cask soyomarvaldezg/tap/mocksmith
-```
-
-Windows (PowerShell):
-
-```powershell
-scoop bucket add soyomarvaldezg https://github.com/soyomarvaldezg/scoop-bucket
-scoop install soyomarvaldezg/mocksmith
-```
-
-Nix:
-
-```bash
-nix run github:soyomarvaldezg/mocksmith
-```
-
-Any platform with Go 1.26.4+:
-
-```bash
-go install github.com/soyomarvaldezg/mocksmith@latest
-```
-
-Prebuilt binaries and source builds are covered in [Installation](#installation).
+See [Installation](#installation) for Homebrew, Scoop, Nix, prebuilt binaries,
+`go install`, and building from source.
 
 ### Verify
 
@@ -49,12 +25,11 @@ mocksmith version
 
 ```bash
 mocksmith sql users 3 id=uuid name=firstname email=email
-```
-```
-INSERT INTO users (id,name,email) VALUES
-('c2b4a6e4...','Jonathon','gia_wilkinson@gibson.biz'),
-('70034b7b...','Clarissa','darianabaker@elliott.info'),
-('a3b4ba15...','Zoey','eadams@higgins.org');
+
+# → INSERT INTO users (id,name,email) VALUES
+#   ('c2b4a6e4...','Jonathon','gia_wilkinson@gibson.biz'),
+#   ('70034b7b...','Clarissa','darianabaker@elliott.info'),
+#   ('a3b4ba15...','Zoey','eadams@higgins.org');
 ```
 
 ## Features
@@ -66,7 +41,7 @@ mocksmith csv   100 id=uuid name=firstname email=email
 mocksmith jsonl 100 id=uuid name=firstname email=email
 ```
 
-### 363 generators (gofakeit engine)
+### 360+ generators (gofakeit engine)
 ```bash
 mocksmith sql customers 5 id=uuid name=firstname phone=phone city=city country=country
 mocksmith sql products  5 sku=regex:[A-Z]{3}-[0-9]{4} name=productname price=price
@@ -107,8 +82,9 @@ mocksmith sql orders 1000 status=weighted:delivered:70,pending:20,refunded:10
 mocksmith jsonl 10000 status=weighted:200:92,404:5,500:3
 ```
 
-Weights are relative — `A:70,B:30` is the same distribution as `A:7,B:3`.
-Zero-weighted items are silently excluded.
+Use it for categorical values as well: `weighted:red:1,green:1,blue:1` picks
+uniformly. Weights are relative — `A:70,B:30` is the same distribution as
+`A:7,B:3`. Zero-weighted items are silently excluded.
 
 ### Foreign key references
 ```bash
@@ -133,17 +109,19 @@ Dot-notation creates nested objects at any depth:
 ```bash
 # Two-level nesting
 mocksmith jsonl 3 _id=uuid 'name.first=firstname' 'name.last=lastname' 'address.city=city' --seed 42
-# → {"_id":"c2b...","name":{"first":"Jonathon","last":"Padberg"},"address":{"city":"Chesapeake"}}
+# → {"_id":"c2b4a6e4-...","address":{"city":"North Las Vegas"},"name":{"first":"Jonathon","last":"Marquardt"}}
 
 # Three or more levels
 mocksmith jsonl 3 _id=uuid 'profile.name.first=firstname' 'profile.name.last=lastname' \
-  'profile.contact.email=email' 'meta.system.env=randomstring:prod,staging,dev' --seed 42
-# → {"_id":"...","profile":{"name":{"first":"Jonathon","last":"Padberg"},"contact":{"email":"..."}},"meta":{"system":{"env":"prod"}}}
+  'profile.contact.email=email' 'meta.system.env=weighted:prod:1,staging:1,dev:1' --seed 42
+# → {"_id":"...","meta":{"system":{"env":"dev"}},"profile":{"contact":{"email":"..."},"name":{"first":"Jonathon","last":"Marquardt"}}}
 
 # Arrays (1-5 items per document)
-mocksmith jsonl 3 _id=uuid 'orders[].id=uuid' 'orders[].amount=price' 'orders[].status=randomstring:pending,shipped,delivered' --seed 42
-# → {"_id":"...","orders":[{"id":"...","amount":"...","status":"shipped"},...]}
+mocksmith jsonl 3 _id=uuid 'orders[].id=uuid' 'orders[].amount=price' 'orders[].status=weighted:pending:5,shipped:3,delivered:2' --seed 42
+# → {"_id":"...","orders":[{"amount":"...","id":"...","status":"shipped"},...]}
 ```
+
+Keys are written in alphabetical order within each object, as shown above.
 
 ### Save to file
 ```bash
@@ -182,8 +160,13 @@ Use `--dialect mysql` when loading into MySQL, which also escapes
 backslashes so corrupt or outlier values cannot escape the string literal:
 
 ```bash
-mocksmith sql t 10 x=randomstring:a\b --dialect mysql
+mocksmith sql t 10 'x=regex:a[\\]{1}b' --dialect mysql   # → 'a\\b'
 ```
+
+Quoting is decided per value, not per column: a value made only of digits is
+written unquoted, so `phone` or `zip` land as bare integers. If the target
+column is textual, use a generator that keeps a separator (`phoneformatted`),
+or quote/cast the value on import.
 
 ### Streaming by default
 Rows are written one at a time through `io.Writer`. No memory accumulation — handle millions of rows.
@@ -217,7 +200,7 @@ Install into your profile:
 nix profile install github:soyomarvaldezg/mocksmith
 ```
 
-Or add it to a flake and use it directly:
+Or in your own `flake.nix`, add the input and use the package directly:
 
 ```nix
 inputs.mocksmithSrc.url = "github:soyomarvaldezg/mocksmith";
@@ -225,8 +208,8 @@ inputs.mocksmithSrc.url = "github:soyomarvaldezg/mocksmith";
 # inputs.mocksmithSrc.packages.${pkgs.system}.default
 ```
 
-To make `pkgs.mocksmith` available in `environment.systemPackages`, add
-an overlay in the same flake:
+To make `pkgs.mocksmith` available in `environment.systemPackages`, take
+`mocksmithSrc` as a flake input and add an overlay with it:
 
 ```nix
 nixpkgs.overlays = [
@@ -284,9 +267,11 @@ go build -o mocksmith .
 mocksmith [command]
 
 Available Commands:
-  sql         Generate SQL INSERT statements
+  completion  Generate the autocompletion script for the specified shell
   csv         Generate CSV data
+  help        Help about any command
   jsonl       Generate JSON Lines data
+  sql         Generate SQL INSERT statements
   template    Generate a dataset from a predefined template
   version     Print version information
 
@@ -350,14 +335,17 @@ job=jobtitle                     →  "Director"
 bio=sentence:30                  →  "State assumptions behind the eye."
 age=number:18,80                 →  "47"
 sku=regex:[A-Z]{3}-[0-9]{4}     →  "QJQ-5922"
-status=randomstring:pending,shipped,delivered  →  "shipped"
+status=weighted:pending:5,shipped:3,delivered:2  →  "shipped"
 product=productname              →  "Smoke Detector Auto-Adjusting Aura"
 agent=useragent                  →  "Mozilla/5.0 (Windows 95; ...)"
 street=street                    →  "36913 Prairieside"
 date=date                        →  "2004-06-03T01:38:55Z"
 ```
 
-363 generators total. Any gofakeit function works — see [gofakeit docs](https://github.com/brianvoe/gofakeit).
+360+ generators total. Most gofakeit functions work — see
+[gofakeit docs](https://github.com/brianvoe/gofakeit). List-style parameters
+(`randomstring:a,b,c`) are not passed through the template engine; use
+`weighted:a:1,b:1,c:1` instead.
 
 ## Real-World Use Cases
 
@@ -430,10 +418,10 @@ instructions. At runtime, data generation streams through `io.Writer` — rows a
 built by gofakeit's template engine (minimal allocation, no reflection in the
 hot path), buffered through `bufio.Writer` to batch system calls, and flushed
 to disk or stdout. Memory usage stays constant regardless of row count since
-rows are never accumulated. The only thing that grows is the optional duplicate
-cache. A Python equivalent would pay interpreter overhead on every row, allocate
-Python objects for every value, and likely materialize the entire dataset in
-memory before writing.
+rows are never accumulated. The only things that grow are the optional duplicate
+cache and any `ref:` source files loaded for foreign keys. A Python equivalent
+would pay interpreter overhead on every row, allocate Python objects for every
+value, and likely materialize the entire dataset in memory before writing.
 
 ## Scope
 
