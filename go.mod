@@ -3,7 +3,7 @@ module github.com/soyomarvaldezg/mocksmith
 go 1.26.4
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.18.0
+	github.com/brianvoe/gofakeit/v7 v7.18.1
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
